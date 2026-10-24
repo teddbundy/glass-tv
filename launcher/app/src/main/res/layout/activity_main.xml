@@ -131,10 +131,10 @@
                             android:includeFontPadding="false"
                             android:format12Hour="a"
                             android:format24Hour=""
-                            android:textColor="#B3FFFFFF"
+                            android:textColor="#FFFFFFFF"
                             android:textSize="15sp"
                             android:fontFamily="@font/outfit"
-                            android:fontVariationSettings="'wght' 500"
+                            android:fontVariationSettings="'wght' 700"
                             android:letterSpacing="0.08"
                             android:textAllCaps="true" />
 
@@ -171,10 +171,10 @@
                                 android:includeFontPadding="false"
                                 android:format12Hour="@string/date_format"
                                 android:format24Hour="@string/date_format"
-                                android:textColor="#A6FFFFFF"
+                                android:textColor="#FFFFFFFF"
                                 android:textSize="14sp"
                                 android:fontFamily="@font/outfit"
-                                android:fontVariationSettings="'wght' 400"
+                                android:fontVariationSettings="'wght' 700"
                                 android:letterSpacing="0.14"
                                 android:textAllCaps="true" />
                         </LinearLayout>
