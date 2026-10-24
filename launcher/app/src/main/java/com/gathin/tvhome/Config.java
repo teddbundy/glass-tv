@@ -52,6 +52,8 @@ final class Config {
     final boolean showNetworkPill;
     /** The Live TV row in the Inputs menu (config.xml, show_live_tv). */
     final boolean showLiveTv;
+    /** The focused app's name above the dock (config.xml, show_hero_name). */
+    final boolean showHeroName;
     /** Background colour behind everything, #RRGGBB; black unless a theme says otherwise. */
     final int backgroundColor;
     /** Full-screen picture behind the launcher, or null for the plain colour. */
@@ -72,6 +74,7 @@ final class Config {
                    int columns, int rowsBelowDock,
                    boolean shamsiDate, boolean moduleCards, boolean reducedMotion, String vpnApp,
                    boolean showHomeSettingsShortcut, boolean showNetworkPill, boolean showLiveTv,
+                   boolean showHeroName,
                    int backgroundColor,
                    File wallpaper, List<File> wallpapers, long wallpaperIntervalMs,
                    boolean places, int cacheCleanDays, boolean overlayApplied) {
@@ -91,6 +94,7 @@ final class Config {
         this.showHomeSettingsShortcut = showHomeSettingsShortcut;
         this.showNetworkPill = showNetworkPill;
         this.showLiveTv = showLiveTv;
+        this.showHeroName = showHeroName;
         this.backgroundColor = backgroundColor;
         this.wallpaper = wallpaper;
         this.wallpapers = Collections.unmodifiableList(wallpapers);
@@ -123,6 +127,7 @@ final class Config {
         boolean homeSettings = res.getBoolean(R.bool.show_home_settings_shortcut);
         boolean networkPill = res.getBoolean(R.bool.show_network_pill);
         boolean liveTvRow = res.getBoolean(R.bool.show_live_tv);
+        boolean heroName = res.getBoolean(R.bool.show_hero_name);
         int background = 0xFF000000;
         boolean applied = false;
 
@@ -147,6 +152,7 @@ final class Config {
             homeSettings = bool(json, "show_home_settings_shortcut", homeSettings);
             networkPill = bool(json, "show_network_pill", networkPill);
             liveTvRow = bool(json, "show_live_tv", liveTvRow);
+            heroName = bool(json, "show_hero_name", heroName);
             background = color(json, "background_color", background);
         }
         File wallpaper = dir != null ? new File(dir, WALLPAPER_NAME) : null;
@@ -173,7 +179,7 @@ final class Config {
 
         return new Config(dock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(0, rowsBelow), shamsi, moduleCards, reducedMotion,
-                vpn, homeSettings, networkPill, liveTvRow, background, wallpaper, wallpapers, wallpaperIntervalMs,
+                vpn, homeSettings, networkPill, liveTvRow, heroName, background, wallpaper, wallpapers, wallpaperIntervalMs,
                 places, cacheCleanDays, applied);
     }
 
