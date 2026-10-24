@@ -146,6 +146,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean moduleCards;
     /** Calmer motion for weak GPUs (config.xml, reduced_motion): stiff spring, short fades, no replay. */
     private boolean reducedMotion;
+    /** The focused app's name above the dock (config.xml, show_hero_name): false hides the name. */
+    private boolean showHeroName;
     /** hidden_apps as the adapter sees them (config.xml or a theme's config.json): a hidden app gets no card either. */
     private Set<String> hiddenApps = Collections.emptySet();
     private List<Cards.Card> cards = Collections.emptyList();
@@ -246,6 +248,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         Config cfg = Config.load(this);
         COLUMNS = cfg.columns;
         reducedMotion = cfg.reducedMotion;
+        showHeroName = cfg.showHeroName;
         liveTvPkg = cfg.liveTvPackage;
         liveTvAction = cfg.liveTvAction;
         inputAction = cfg.inputAction;
@@ -880,6 +883,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         final String desc = placeName != null ? placeText : "";
         final String where = placeName != null ? placeCountry : "";
         int color = adapter.ambientColorAt(position);
+        if (!showHeroName) {
+            // Hero title off: never show the name, but keep the ambient glow following focus.
+            hideShelf();
+            showAmbient(color);
+            return;
+        }
         heroBottom = dockTopInRoot - HERO_GAP_DP * density;
         float y = heroBottom - heroShelf.getHeight();
         boolean changed = !label.contentEquals(heroName.getText());
