@@ -208,6 +208,20 @@
                     android:drawableStart="@drawable/ic_wifi"
                     android:nextFocusDown="@+id/grid" />
 
+                <!-- Moon button: opens the screensaver view on demand. Same style and same row as
+                     the other pills, so the gap to the Wi-Fi pill is exactly the gap to the gear
+                     button (the style's 10dp marginStart). Icon-only, like the gear button. -->
+                <TextView
+                    android:id="@+id/btnSleep"
+                    style="@style/TopMenuButton"
+                    android:layout_width="42dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="0dp"
+                    android:drawablePadding="0dp"
+                    android:contentDescription="@string/screensaver"
+                    android:drawableStart="@drawable/ic_moon"
+                    android:nextFocusDown="@+id/grid" />
+
                 <TextView
                     android:id="@+id/btnSettings"
                     style="@style/TopMenuButton"
@@ -222,8 +236,10 @@
         </RelativeLayout>
 
         <!-- Prayer times (JAKIM e-solat, see PrayerTimes): a slim bar the height of an app tile,
-             between the top bar and the grid. Hidden when show_prayer_times is off or there is no
-             data yet. Display only, never focused: the pills' nextFocusDown already skips to the grid. -->
+             between the top bar and the grid. Only when show_prayer_times_home is on; off, the row
+             is gone entirely and Home is exactly as it was before the feature. Hidden when there
+             is no data yet. Display only, never focused: the pills' nextFocusDown already skips
+             to the grid. -->
         <LinearLayout
             android:id="@+id/prayerRow"
             android:layout_width="match_parent"

@@ -127,6 +127,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private float heroBottom;
     private View btnInputs;
     private TextView btnWifi;
+    private View btnSleep;
     private TextView shamsiDate;
     private boolean shamsi;
     private String vpnApp;
@@ -148,9 +149,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean reducedMotion;
     /** The focused app's name above the dock (config.xml, show_hero_name): false hides the name. */
     private boolean showHeroName;
-    /** Prayer times (JAKIM e-solat, see PrayerTimes): the zone and whether the row shows. */
+    /** Prayer times (JAKIM e-solat, see PrayerTimes): the zone, whether they show at all, and
+         whether the home row shows them too. */
     private String prayerZone;
     private boolean showPrayerTimes;
+    private boolean showPrayerTimesHome;
     private View prayerRow;
     private TextView prayerZoneView, prayerHijriView, prayerCountdownView;
     private final View[] prayerCells = new View[5];
@@ -260,6 +263,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         showHeroName = cfg.showHeroName;
         prayerZone = cfg.prayerZone;
         showPrayerTimes = cfg.showPrayerTimes;
+        showPrayerTimesHome = cfg.showPrayerTimesHome;
         liveTvPkg = cfg.liveTvPackage;
         liveTvAction = cfg.liveTvAction;
         inputAction = cfg.inputAction;
@@ -327,8 +331,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             prayerCellNames[i] = findViewById(cellNameIds[i]);
             prayerCellTimes[i] = findViewById(cellTimeIds[i]);
         }
-        if (!showPrayerTimes) prayerRow.setVisibility(View.GONE);
-        else refreshPrayerIfDue();
+        // Home shows the row only when the theme asks for it; the fetch below still runs when the
+        // screensaver wants the times, so hiding the row never starves the screensaver's cache.
+        if (!showPrayerTimesHome) prayerRow.setVisibility(View.GONE);
+        refreshPrayerIfDue();
         // Beside the clock, the date sits on the digits' baseline, and AM/PM rests halfway between
         // the top of the digits and the top of the date, its letters' foot on that line.
         TextView clock = findViewById(R.id.clock), amPm = findViewById(R.id.ampm), dateLine = findViewById(R.id.date);
@@ -376,7 +382,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         }
         // The grid only shows the shape on the tray.
         glider.addCompanion(grid, tray.area);
-        for (int id : new int[]{R.id.btnInputs, R.id.btnWifi, R.id.btnSettings}) {
+        for (int id : new int[]{R.id.btnInputs, R.id.btnWifi, R.id.btnSleep, R.id.btnSettings}) {
             View pill = findViewById(id);
             pill.setBackground(new GlassDrawable(pill, 21 * density, density, glider));
             glider.addCompanion(pill);
@@ -450,7 +456,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
         btnInputs = findViewById(R.id.btnInputs);
         View btnSettings = findViewById(R.id.btnSettings);
+        btnSleep = findViewById(R.id.btnSleep);
         btnInputs.setOnClickListener(v -> showInputs());
+        btnSleep.setOnClickListener(v -> openSleep());
         btnWifi.setOnClickListener(v -> openNetworkPill());
         btnWifi.setOnLongClickListener(v -> {
             open(systemIntent(Settings.ACTION_WIFI_SETTINGS));
@@ -474,16 +482,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 return true;
             }
             if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-                // The left end is Inputs, or Wi-Fi on a box without inputs, or Settings when both are gone.
+                // The left end is Inputs, or Wi-Fi on a box without inputs, or the moon button when
+                // both are gone, or Settings when all three are gone.
                 return v.getId() == R.id.btnInputs
                         || (v.getId() == R.id.btnWifi && btnInputs.getVisibility() != View.VISIBLE)
+                        || (v.getId() == R.id.btnSleep && btnInputs.getVisibility() != View.VISIBLE
+                            && btnWifi.getVisibility() != View.VISIBLE)
                         || (v.getId() == R.id.btnSettings && btnInputs.getVisibility() != View.VISIBLE
-                            && btnWifi.getVisibility() != View.VISIBLE);
+                            && btnWifi.getVisibility() != View.VISIBLE
+                            && btnSleep.getVisibility() != View.VISIBLE);
             }
             return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == R.id.btnSettings;
         };
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
+        btnSleep.setOnKeyListener(pillKeys);
         btnSettings.setOnKeyListener(pillKeys);
 
         // Hide the glass when focus leaves the tiles.
@@ -1003,7 +1016,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     private boolean isTopPill(View v) {
         int id = v.getId();
-        return id == R.id.btnInputs || id == R.id.btnWifi || id == R.id.btnSettings;
+        return id == R.id.btnInputs || id == R.id.btnWifi || id == R.id.btnSleep || id == R.id.btnSettings;
     }
 
     /** Sends the focus shape onto a pill: from a tile it glides up and narrows into the pill. */
@@ -1499,7 +1512,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (shamsi) shamsiDate.setText(Shamsi.today());
     }
 
-    /** Fetches today's prayer times when due (once a day), then shows them; the row stays hidden until there is data. */
+    /** Fetches today's prayer times when due (once a day). The fetch serves the screensaver's
+         cache; the home row only shows when show_prayer_times_home is on. */
     private void refreshPrayerIfDue() {
         if (!showPrayerTimes) return;
         if (!PrayerTimes.due(this, prayerZone)) {
@@ -1515,9 +1529,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         }, "prayer-times").start();
     }
 
-    /** Fills the prayer row from the cached times, or hides it when there is nothing to show. */
+    /** Fills the home prayer row from the cached times, or hides it when there is nothing to show.
+         Only runs when the home row is on; the screensaver reads the same cache itself. */
     private void updatePrayerRow() {
-        if (!showPrayerTimes || prayerRow == null) return;
+        if (!showPrayerTimesHome || prayerRow == null) return;
         PrayerTimes.Data data = PrayerTimes.load(this);
         if (data == null) {
             prayerRow.setVisibility(View.GONE);
@@ -1604,6 +1619,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         Intent i = vpnApp.isEmpty() ? null : getPackageManager().getLeanbackLaunchIntentForPackage(vpnApp);
         if (i == null && !vpnApp.isEmpty()) i = getPackageManager().getLaunchIntentForPackage(vpnApp);
         open(i != null ? i : systemIntent(Settings.ACTION_WIFI_SETTINGS));
+    }
+
+    /** Opens the screensaver view on demand (the moon button): the same clock and prayer times as
+         the idle screensaver, in the same task so any key press returns to Home. */
+    private void openSleep() {
+        startActivity(new Intent(this, SleepActivity.class));
     }
 
 

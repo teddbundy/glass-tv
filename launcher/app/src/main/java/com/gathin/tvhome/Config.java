@@ -56,8 +56,12 @@ final class Config {
     final boolean showHeroName;
     /** JAKIM e-solat zone for the prayer times (config.xml, prayer_zone): JHR03 is Kluang, Johor. */
     final String prayerZone;
-    /** Whether the prayer row and the screensaver's times show (config.xml, show_prayer_times). */
+    /** Whether the prayer times show at all: the screensaver's times and the daily fetch that keeps
+         their cache fresh (config.xml, show_prayer_times). */
     final boolean showPrayerTimes;
+    /** Whether the prayer row also shows on the home screen (config.xml, show_prayer_times_home).
+         False keeps Home as it was, with the times only in the screensaver. */
+    final boolean showPrayerTimesHome;
     /** Background colour behind everything, #RRGGBB; black unless a theme says otherwise. */
     final int backgroundColor;
     /** Full-screen picture behind the launcher, or null for the plain colour. */
@@ -79,6 +83,7 @@ final class Config {
                    boolean shamsiDate, boolean moduleCards, boolean reducedMotion, String vpnApp,
                    boolean showHomeSettingsShortcut, boolean showNetworkPill, boolean showLiveTv,
                    boolean showHeroName, String prayerZone, boolean showPrayerTimes,
+                   boolean showPrayerTimesHome,
                    int backgroundColor,
                    File wallpaper, List<File> wallpapers, long wallpaperIntervalMs,
                    boolean places, int cacheCleanDays, boolean overlayApplied) {
@@ -101,6 +106,7 @@ final class Config {
         this.showHeroName = showHeroName;
         this.prayerZone = prayerZone;
         this.showPrayerTimes = showPrayerTimes;
+        this.showPrayerTimesHome = showPrayerTimesHome;
         this.backgroundColor = backgroundColor;
         this.wallpaper = wallpaper;
         this.wallpapers = Collections.unmodifiableList(wallpapers);
@@ -136,6 +142,7 @@ final class Config {
         boolean heroName = res.getBoolean(R.bool.show_hero_name);
         String prayerZone = res.getString(R.string.prayer_zone).trim();
         boolean showPrayer = res.getBoolean(R.bool.show_prayer_times);
+        boolean showPrayerHome = res.getBoolean(R.bool.show_prayer_times_home);
         int background = 0xFF000000;
         boolean applied = false;
 
@@ -163,6 +170,7 @@ final class Config {
             heroName = bool(json, "show_hero_name", heroName);
             prayerZone = string(json, "prayer_zone", prayerZone);
             showPrayer = bool(json, "show_prayer_times", showPrayer);
+            showPrayerHome = bool(json, "show_prayer_times_home", showPrayerHome);
             background = color(json, "background_color", background);
         }
         File wallpaper = dir != null ? new File(dir, WALLPAPER_NAME) : null;
@@ -192,7 +200,7 @@ final class Config {
 
         return new Config(dock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(0, rowsBelow), shamsi, moduleCards, reducedMotion,
-                vpn, homeSettings, networkPill, liveTvRow, heroName, prayerZone, showPrayer, background, wallpaper, wallpapers, wallpaperIntervalMs,
+                vpn, homeSettings, networkPill, liveTvRow, heroName, prayerZone, showPrayer, showPrayerHome, background, wallpaper, wallpapers, wallpaperIntervalMs,
                 places, cacheCleanDays, applied);
     }
 

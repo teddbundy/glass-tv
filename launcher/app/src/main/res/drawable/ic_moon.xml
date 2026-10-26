@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Crescent moon (Material "brightness_2"), for the moon button that opens the screensaver view. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M10,2c-1.82,0 -3.53,0.5 -5,1.35C7.99,5.08 10,8.3 10,12s-2.01,6.92 -4.99,8.65C6.48,21.5 8.19,22 10,22c5.52,0 10,-4.48 10,-10S15.52,2 10,2z" />
+</vector>
