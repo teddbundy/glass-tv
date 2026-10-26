@@ -54,6 +54,10 @@ final class Config {
     final boolean showLiveTv;
     /** The focused app's name above the dock (config.xml, show_hero_name). */
     final boolean showHeroName;
+    /** JAKIM e-solat zone for the prayer times (config.xml, prayer_zone): JHR03 is Kluang, Johor. */
+    final String prayerZone;
+    /** Whether the prayer row and the screensaver's times show (config.xml, show_prayer_times). */
+    final boolean showPrayerTimes;
     /** Background colour behind everything, #RRGGBB; black unless a theme says otherwise. */
     final int backgroundColor;
     /** Full-screen picture behind the launcher, or null for the plain colour. */
@@ -74,7 +78,7 @@ final class Config {
                    int columns, int rowsBelowDock,
                    boolean shamsiDate, boolean moduleCards, boolean reducedMotion, String vpnApp,
                    boolean showHomeSettingsShortcut, boolean showNetworkPill, boolean showLiveTv,
-                   boolean showHeroName,
+                   boolean showHeroName, String prayerZone, boolean showPrayerTimes,
                    int backgroundColor,
                    File wallpaper, List<File> wallpapers, long wallpaperIntervalMs,
                    boolean places, int cacheCleanDays, boolean overlayApplied) {
@@ -95,6 +99,8 @@ final class Config {
         this.showNetworkPill = showNetworkPill;
         this.showLiveTv = showLiveTv;
         this.showHeroName = showHeroName;
+        this.prayerZone = prayerZone;
+        this.showPrayerTimes = showPrayerTimes;
         this.backgroundColor = backgroundColor;
         this.wallpaper = wallpaper;
         this.wallpapers = Collections.unmodifiableList(wallpapers);
@@ -128,6 +134,8 @@ final class Config {
         boolean networkPill = res.getBoolean(R.bool.show_network_pill);
         boolean liveTvRow = res.getBoolean(R.bool.show_live_tv);
         boolean heroName = res.getBoolean(R.bool.show_hero_name);
+        String prayerZone = res.getString(R.string.prayer_zone).trim();
+        boolean showPrayer = res.getBoolean(R.bool.show_prayer_times);
         int background = 0xFF000000;
         boolean applied = false;
 
@@ -153,6 +161,8 @@ final class Config {
             networkPill = bool(json, "show_network_pill", networkPill);
             liveTvRow = bool(json, "show_live_tv", liveTvRow);
             heroName = bool(json, "show_hero_name", heroName);
+            prayerZone = string(json, "prayer_zone", prayerZone);
+            showPrayer = bool(json, "show_prayer_times", showPrayer);
             background = color(json, "background_color", background);
         }
         File wallpaper = dir != null ? new File(dir, WALLPAPER_NAME) : null;
@@ -176,10 +186,13 @@ final class Config {
         boolean places = wallpaperOn && (json == null || bool(json, "places", true));
         int cacheCleanDays = json != null ? integer(json, "cache_clean_days", CacheCleaner.DEFAULT_DAYS, 0, 90)
                 : CacheCleaner.DEFAULT_DAYS;
+        // Zone codes are short capitals (JHR03): anything else is not a zone the API knows.
+        prayerZone = prayerZone.toUpperCase(java.util.Locale.ROOT).replaceAll("[^A-Z0-9]", "");
+        if (prayerZone.isEmpty()) prayerZone = "JHR03";
 
         return new Config(dock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(0, rowsBelow), shamsi, moduleCards, reducedMotion,
-                vpn, homeSettings, networkPill, liveTvRow, heroName, background, wallpaper, wallpapers, wallpaperIntervalMs,
+                vpn, homeSettings, networkPill, liveTvRow, heroName, prayerZone, showPrayer, background, wallpaper, wallpapers, wallpaperIntervalMs,
                 places, cacheCleanDays, applied);
     }
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The next prayer in the bar: green, like the countdown text. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#2E4ADE80" />
+    <stroke android:width="2dp" android:color="#FF4ADE80" />
+    <corners android:radius="10dp" />
+</shape>

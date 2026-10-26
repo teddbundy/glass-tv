@@ -56,5 +56,188 @@
             android:letterSpacing="0.14"
             android:textAllCaps="true"
             android:includeFontPadding="false" />
+
+        <!-- Prayer times (JAKIM e-solat, see PrayerTimes): divider, next-prayer countdown, then the
+             five times. Inside dreamContent, so they drift with the clock. Hidden when there is no
+             data; sizes are set in code from the screen height, like the clock. -->
+        <View
+            android:id="@+id/dreamPrayerDivider"
+            android:layout_width="260dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:background="#FF8B8C90"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/dreamPrayerNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="#FF4ADE80"
+            android:fontFamily="@font/outfit"
+            android:fontVariationSettings="'wght' 700"
+            android:letterSpacing="0.08"
+            android:textAllCaps="true"
+            android:includeFontPadding="false"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/dreamPrayerRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/dreamPrayerName0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD4D4D6"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 700"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/dreamPrayerTime0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#FF8B8C90"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 400"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/dreamPrayerName1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD4D4D6"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 700"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/dreamPrayerTime1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#FF8B8C90"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 400"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/dreamPrayerName2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD4D4D6"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 700"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/dreamPrayerTime2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#FF8B8C90"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 400"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/dreamPrayerName3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD4D4D6"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 700"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/dreamPrayerTime3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#FF8B8C90"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 400"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/dreamPrayerName4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD4D4D6"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 700"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/dreamPrayerTime4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#FF8B8C90"
+                    android:fontFamily="@font/outfit"
+                    android:fontVariationSettings="'wght' 400"
+                    android:includeFontPadding="false"
+                    android:singleLine="true" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

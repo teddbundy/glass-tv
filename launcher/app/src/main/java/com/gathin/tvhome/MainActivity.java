@@ -148,6 +148,14 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean reducedMotion;
     /** The focused app's name above the dock (config.xml, show_hero_name): false hides the name. */
     private boolean showHeroName;
+    /** Prayer times (JAKIM e-solat, see PrayerTimes): the zone and whether the row shows. */
+    private String prayerZone;
+    private boolean showPrayerTimes;
+    private View prayerRow;
+    private TextView prayerZoneView, prayerHijriView, prayerCountdownView;
+    private final View[] prayerCells = new View[5];
+    private final TextView[] prayerCellNames = new TextView[5];
+    private final TextView[] prayerCellTimes = new TextView[5];
     /** hidden_apps as the adapter sees them (config.xml or a theme's config.json): a hidden app gets no card either. */
     private Set<String> hiddenApps = Collections.emptySet();
     private List<Cards.Card> cards = Collections.emptyList();
@@ -234,6 +242,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         public void run() {
             updateShamsiDate();
             updateWifiLabel();
+            refreshPrayerIfDue();
             refreshPlacesIfDue();
             handler.postDelayed(this, MINUTE_MS);
         }
@@ -249,6 +258,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         COLUMNS = cfg.columns;
         reducedMotion = cfg.reducedMotion;
         showHeroName = cfg.showHeroName;
+        prayerZone = cfg.prayerZone;
+        showPrayerTimes = cfg.showPrayerTimes;
         liveTvPkg = cfg.liveTvPackage;
         liveTvAction = cfg.liveTvAction;
         inputAction = cfg.inputAction;
@@ -302,6 +313,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             date.setTextSize(11f);
             date.setPadding(0, (int) (4 * density), 0, 0);
         }
+        prayerRow = findViewById(R.id.prayerRow);
+        prayerZoneView = findViewById(R.id.prayerZone);
+        prayerHijriView = findViewById(R.id.prayerHijri);
+        prayerCountdownView = findViewById(R.id.prayerCountdown);
+        int[] cellIds = {R.id.prayerCell0, R.id.prayerCell1, R.id.prayerCell2, R.id.prayerCell3, R.id.prayerCell4};
+        int[] cellNameIds = {R.id.prayerCellName0, R.id.prayerCellName1, R.id.prayerCellName2,
+                R.id.prayerCellName3, R.id.prayerCellName4};
+        int[] cellTimeIds = {R.id.prayerCellTime0, R.id.prayerCellTime1, R.id.prayerCellTime2,
+                R.id.prayerCellTime3, R.id.prayerCellTime4};
+        for (int i = 0; i < 5; i++) {
+            prayerCells[i] = findViewById(cellIds[i]);
+            prayerCellNames[i] = findViewById(cellNameIds[i]);
+            prayerCellTimes[i] = findViewById(cellTimeIds[i]);
+        }
+        if (!showPrayerTimes) prayerRow.setVisibility(View.GONE);
+        else refreshPrayerIfDue();
         // Beside the clock, the date sits on the digits' baseline, and AM/PM rests halfway between
         // the top of the digits and the top of the date, its letters' foot on that line.
         TextView clock = findViewById(R.id.clock), amPm = findViewById(R.id.ampm), dateLine = findViewById(R.id.date);
@@ -673,6 +700,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         reloadApps(true);
         updateShamsiDate();
         updateWifiLabel();
+        refreshPrayerIfDue();
         updateInputsButton();
         startWallpaperRotation();
         handler.postDelayed(minuteTick, MINUTE_MS);
@@ -1469,6 +1497,45 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     private void updateShamsiDate() {
         if (shamsi) shamsiDate.setText(Shamsi.today());
+    }
+
+    /** Fetches today's prayer times when due (once a day), then shows them; the row stays hidden until there is data. */
+    private void refreshPrayerIfDue() {
+        if (!showPrayerTimes) return;
+        if (!PrayerTimes.due(this, prayerZone)) {
+            updatePrayerRow();
+            return;
+        }
+        new Thread(() -> {
+            PrayerTimes.refresh(this, prayerZone);
+            handler.post(() -> {
+                if (isDestroyed()) return;
+                updatePrayerRow();
+            });
+        }, "prayer-times").start();
+    }
+
+    /** Fills the prayer row from the cached times, or hides it when there is nothing to show. */
+    private void updatePrayerRow() {
+        if (!showPrayerTimes || prayerRow == null) return;
+        PrayerTimes.Data data = PrayerTimes.load(this);
+        if (data == null) {
+            prayerRow.setVisibility(View.GONE);
+            return;
+        }
+        Calendar now = Calendar.getInstance();
+        int next = PrayerTimes.nextIndex(data, now);
+        prayerZoneView.setText(PrayerTimes.zoneLabel(data.zone));
+        prayerHijriView.setText(data.hijriMalay());
+        prayerCountdownView.setText(PrayerTimes.countdownLabel(data, now));
+        for (int i = 0; i < 5; i++) {
+            prayerCellNames[i].setText(PrayerTimes.NAMES[i]);
+            prayerCellTimes[i].setText(PrayerTimes.formatTime12(data.minutes[i]));
+            boolean isNext = i == next;
+            prayerCells[i].setBackgroundResource(isNext ? R.drawable.prayer_cell_next : R.drawable.prayer_cell);
+            prayerCellNames[i].setTextColor(isNext ? 0xFF4ADE80 : 0xFFFFFFFF);
+        }
+        prayerRow.setVisibility(View.VISIBLE);
     }
 
     /** Shows the Wi-Fi network name on the button when we can read it, otherwise the connection type. */
