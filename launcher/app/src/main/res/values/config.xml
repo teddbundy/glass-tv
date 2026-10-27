@@ -62,14 +62,6 @@
     <!-- The focused app's name above the dock (the "hero" title). false hides the name; the dock and its
          ambient glow are unchanged. -->
     <bool name="show_hero_name">true</bool>
-    <!-- Prayer times (JAKIM e-solat, see PrayerTimes): the zone code, e.g. JHR03 for Kluang, Johor.
-         Set "prayer_zone" in a theme's config.json to change it without a rebuild.
-         "show_prayer_times" is the screensaver's times, and the daily fetch that keeps them fresh;
-         "show_prayer_times_home" also puts the row on the home screen. False there keeps Home as it
-         was, with the times only in the screensaver (and behind the moon button). -->
-    <string name="prayer_zone" translatable="false">JHR03</string>
-    <bool name="show_prayer_times">true</bool>
-    <bool name="show_prayer_times_home">false</bool>
     <!-- Grid rows left visible under the dock on the home screen. 0 = dock sits at the very bottom. -->
     <integer name="rows_below_dock">0</integer>
 

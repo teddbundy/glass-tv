@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Home</string>
-    <string name="prayer_title">Waktu Solat</string>
+    <string name="prayer_title">Waktu Solat Kluang</string>
     <string name="screensaver">Screensaver</string>
     <string name="inputs">Inputs</string>
     <string name="wifi">Wi-Fi</string>
