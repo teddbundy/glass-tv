@@ -119,13 +119,15 @@ final class PrayerTimes {
         return data.minutes[next] - at;
     }
 
-    /** e.g. "Asar in 41 min", "Subuh in 6 h 9 min", or "Maghrib now" at the minute itself. */
+    /** e.g. "Asar dalam 41 minit", "Subuh dalam 6 jam 9 minit", or "Maghrib sekarang" at the minute itself. */
     static String countdownLabel(Data data, Calendar now) {
         int next = nextIndex(data, now);
         int left = minutesUntil(data, now, next);
-        if (left <= 0) return NAMES[next] + " now";
-        if (left < 60) return NAMES[next] + " in " + left + " min";
-        return NAMES[next] + " in " + (left / 60) + " h " + (left % 60) + " min";
+        if (left <= 0) return NAMES[next] + " sekarang";
+        if (left < 60) return NAMES[next] + " dalam " + left + " minit";
+        int h = left / 60, m = left % 60;
+        if (m == 0) return NAMES[next] + " dalam " + h + " jam";
+        return NAMES[next] + " dalam " + h + " jam " + m + " minit";
     }
 
     /** Today's times from the cache, or null when nothing usable has been fetched yet. */
