@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Screensaver (ClockDream): a grey analog clock with the time and date beneath, drifting a little each
-     minute, on the same grey as the clock's face. ClockDream adds the dial and sizes everything to the
-     screen's height. -->
+<!-- Screensaver (ClockDream): digital-only clock on the left, the prayer times on the right,
+     both sized from the screen's height. No analog dial: its second hand redrew every second
+     and stuttered on the 1 GB stick. The whole block drifts a little each minute, with no fade,
+     so nothing burns in. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,233 +12,275 @@
         android:id="@+id/dreamContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
+        <!-- Left: the digital clock and date, in Malay (see ClockDream). -->
         <LinearLayout
-            android:id="@+id/dreamTimeRow"
+            android:id="@+id/dreamClockBlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-            <TextClock
-                android:id="@+id/dreamTime"
+            <LinearLayout
+                android:id="@+id/dreamTimeRow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:format12Hour="h:mm"
-                android:format24Hour="HH:mm"
-                android:textColor="#FFD4D4D6"
-                android:fontFamily="@font/outfit"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <TextClock
+                    android:id="@+id/dreamTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format12Hour="h:mm"
+                    android:format24Hour="HH:mm"
+                    android:textColor="#FFD4D4D6"
+                    android:fontFamily="@font/nunito"
+                    android:fontVariationSettings="'wght' 500"
+                    android:includeFontPadding="false" />
+
+                <!-- Same size as the digits: a small top-aligned AM/PM looked odd. -->
+                <TextClock
+                    android:id="@+id/dreamAmPm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format12Hour="a"
+                    android:format24Hour=""
+                    android:textColor="#FFB5B6B8"
+                    android:fontFamily="@font/nunito"
+                    android:fontVariationSettings="'wght' 500"
+                    android:includeFontPadding="false"
+                    android:textAllCaps="true" />
+            </LinearLayout>
+
+            <TextClock
+                android:id="@+id/dreamDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFB5B6B8"
+                android:fontFamily="@font/nunito"
+                android:fontVariationSettings="'wght' 500"
+                android:letterSpacing="0.14"
+                android:textAllCaps="true"
+                android:includeFontPadding="false" />
+
+            <!-- Day of the week in Malay (e.g. Selasa), set in code. No all-caps: title case. -->
+            <TextView
+                android:id="@+id/dreamDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFB5B6B8"
+                android:fontFamily="@font/nunito"
                 android:fontVariationSettings="'wght' 500"
                 android:includeFontPadding="false" />
 
-            <!-- Top-aligned to the digits: ClockDream lines up the tops of the letters. -->
-            <TextClock
-                android:id="@+id/dreamAmPm"
+            <!-- Hijri date from JAKIM (e.g. 16 Jamadilawal 1448 Hijri), set in code with the
+                 prayer times. No all-caps: title case. Hidden until prayer data is loaded. -->
+            <TextView
+                android:id="@+id/dreamHijri"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:format12Hour="a"
-                android:format24Hour=""
                 android:textColor="#FFB5B6B8"
-                android:fontFamily="@font/outfit"
+                android:fontFamily="@font/nunito"
                 android:fontVariationSettings="'wght' 500"
                 android:includeFontPadding="false"
-                android:textAllCaps="true" />
+                android:visibility="gone" />
         </LinearLayout>
 
-        <TextClock
-            android:id="@+id/dreamDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FF8B8C90"
-            android:fontFamily="@font/outfit"
-            android:fontVariationSettings="'wght' 400"
-            android:letterSpacing="0.14"
-            android:textAllCaps="true"
-            android:includeFontPadding="false" />
-
-        <!-- Prayer times (JAKIM e-solat, see PrayerTimes): divider, next-prayer countdown, then the
-             five times. Inside dreamContent, so they drift with the clock. Hidden when there is no
-             data; sizes are set in code from the screen height, like the clock. -->
+        <!-- Vertical divider between the clock and the prayer times. Hidden with the prayer
+             block when there is no prayer data. -->
         <View
             android:id="@+id/dreamPrayerDivider"
-            android:layout_width="260dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="14dp"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="36dp"
+            android:layout_marginEnd="36dp"
             android:background="#FF8B8C90"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/dreamPrayerNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="#FF4ADE80"
-            android:fontFamily="@font/outfit"
-            android:fontVariationSettings="'wght' 700"
-            android:letterSpacing="0.08"
-            android:textAllCaps="true"
-            android:includeFontPadding="false"
-            android:visibility="gone" />
-
+        <!-- Right: the prayer times (JAKIM e-solat, see PrayerTimes). Hidden when there is no
+             data; sizes are set in code from the screen height, like the clock. -->
         <LinearLayout
-            android:id="@+id/dreamPrayerRow"
+            android:id="@+id/dreamPrayerBlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:visibility="gone">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/dreamPrayerTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/dreamPrayerName0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFD4D4D6"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 700"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-
-                <TextView
-                    android:id="@+id/dreamPrayerTime0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#FF8B8C90"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 400"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-            </LinearLayout>
+                android:text="@string/prayer_title"
+                android:textColor="#FFD4D4D6"
+                android:fontFamily="@font/nunito"
+                android:fontVariationSettings="'wght' 700"
+                android:letterSpacing="0.08"
+                android:textAllCaps="true"
+                android:includeFontPadding="false" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/dreamPrayerRow"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/dreamPrayerName1"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#FFD4D4D6"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 700"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/dreamPrayerTime1"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/dreamPrayerName0"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFD4D4D6"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 700"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:id="@+id/dreamPrayerTime0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:textColor="#FF8B8C90"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 400"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#FF8B8C90"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 400"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/dreamPrayerName1"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFD4D4D6"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 700"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:id="@+id/dreamPrayerTime1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:textColor="#FF8B8C90"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 400"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/dreamPrayerName2"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFD4D4D6"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 700"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:id="@+id/dreamPrayerTime2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:textColor="#FF8B8C90"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 400"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/dreamPrayerName3"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFD4D4D6"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 700"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:id="@+id/dreamPrayerTime3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:textColor="#FF8B8C90"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 400"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/dreamPrayerName4"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFD4D4D6"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 700"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:id="@+id/dreamPrayerTime4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:textColor="#FF8B8C90"
+                        android:fontFamily="@font/nunito"
+                        android:fontVariationSettings="'wght' 400"
+                        android:includeFontPadding="false"
+                        android:singleLine="true" />
+                </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
+            <!-- Countdown last, at the bottom of the prayer block. -->
+            <TextView
+                android:id="@+id/dreamPrayerNext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/dreamPrayerName2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFD4D4D6"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 700"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-
-                <TextView
-                    android:id="@+id/dreamPrayerTime2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#FF8B8C90"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 400"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/dreamPrayerName3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFD4D4D6"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 700"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-
-                <TextView
-                    android:id="@+id/dreamPrayerTime3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#FF8B8C90"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 400"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/dreamPrayerName4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFD4D4D6"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 700"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-
-                <TextView
-                    android:id="@+id/dreamPrayerTime4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#FF8B8C90"
-                    android:fontFamily="@font/outfit"
-                    android:fontVariationSettings="'wght' 400"
-                    android:includeFontPadding="false"
-                    android:singleLine="true" />
-            </LinearLayout>
+                android:layout_marginTop="14dp"
+                android:textColor="#FF4ADE80"
+                android:fontFamily="@font/nunito"
+                android:fontVariationSettings="'wght' 700"
+                android:letterSpacing="0.08"
+                android:textAllCaps="true"
+                android:includeFontPadding="false" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
